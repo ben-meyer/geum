@@ -48,51 +48,52 @@ jobs:
       - name: Build production assets
         run: npm run build
 
-      - name: Deploy theme
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/assets/**
-            **/dev-scripts/**
-            **/.vscode/**
-            **/.github/**
-            **/.claude/**
-            **/.docs/**
-            **/Geum/Dev/**
-            **/Theme/Dev/**
-            **/vendor/squizlabs/**
-            **/vendor/**/tests/**
-            **/vendor/**/Tests/**
-            **/components/**/example.php
-            **/.babelrc
-            **/.browserslistrc
-            **/.editorconfig
-            **/.eslintrc.json
-            **/.nvmrc
-            **/.prettierrc
-            **/.stylelintrc
-            **/.env.example
-            **/auth.json
-            **/composer.json
-            **/composer.lock
-            **/gulpfile.js
-            **/LICENCE
-            **/package-lock.json
-            **/package.json
-            **/postcss.config.js
-            **/vite.config.js
-            **/tailwind.config.js
-            **/biome.json
-            **/pint.json
-            **/phpcs.xml
-            **/readme.md
-            **/CLAUDE.md
-            **/webpack.config.js
+      - name: Deploy theme via SFTP
+        run: |
+          lftp -c "
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:reconnect-interval-base 5;
+            open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} sftp://${{ secrets.FTP_SERVER }}:2223;
+            mirror --reverse --delete --verbose \
+              --exclude ^\.git/ \
+              --exclude ^node_modules/ \
+              --exclude ^assets/ \
+              --exclude ^dev-scripts/ \
+              --exclude ^\.vscode/ \
+              --exclude ^\.github/ \
+              --exclude ^\.claude/ \
+              --exclude ^\.docs/ \
+              --exclude ^Geum/Dev/ \
+              --exclude ^Theme/Dev/ \
+              --exclude ^vendor/squizlabs/ \
+              --exclude vendor/.*/tests/ \
+              --exclude vendor/.*/Tests/ \
+              --exclude example\.php$ \
+              --exclude ^\.babelrc$ \
+              --exclude ^\.browserslistrc$ \
+              --exclude ^\.editorconfig$ \
+              --exclude ^\.eslintrc\.json$ \
+              --exclude ^\.nvmrc$ \
+              --exclude ^\.prettierrc$ \
+              --exclude ^\.stylelintrc$ \
+              --exclude ^\.env\.example$ \
+              --exclude ^auth\.json$ \
+              --exclude ^composer\.json$ \
+              --exclude ^composer\.lock$ \
+              --exclude ^gulpfile\.js$ \
+              --exclude ^LICENCE$ \
+              --exclude ^package-lock\.json$ \
+              --exclude ^package\.json$ \
+              --exclude ^postcss\.config\.js$ \
+              --exclude ^vite\.config\.js$ \
+              --exclude ^tailwind\.config\.js$ \
+              --exclude ^biome\.json$ \
+              --exclude ^pint\.json$ \
+              --exclude ^phpcs\.xml$ \
+              --exclude ^readme\.md$ \
+              --exclude ^CLAUDE\.md$ \
+              --exclude ^webpack\.config\.js$ \
+              ./ ${{ secrets.FTP_SERVER_DIR }};
+          "
 
