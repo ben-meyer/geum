@@ -76,9 +76,6 @@
         "webpack-stream": "^7.0.0",
         "wp-pot": "^2.0.0"
     },
-    "overrides": {
-        "rollup": "npm:@rollup/wasm-node"
-    },
     "dependencies": {
         "lodash.debounce": "^4.0.8",
         "normalize.css": "^8.0.1"
