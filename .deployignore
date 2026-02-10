@@ -1,5 +1,15 @@
+# Dependencies
 node_modules
 node_modules/**
+vendor/squizlabs
+vendor/squizlabs/**
+vendor/**/tests
+vendor/**/Tests
+vendor/**/test
+vendor/**/Test
+vendor/**/.git
+
+# IDE & Config
 .vscode
 .vscode/**
 .babelrc
@@ -14,6 +24,19 @@ node_modules/**
 .nvmrc
 .prettierrc
 .stylelintrc
+
+# Build source files
+assets
+assets/**
+dev-scripts
+dev-scripts/**
+components/**/example.php
+Geum/Dev
+Geum/Dev/**
+Theme/Dev
+Theme/Dev/**
+
+# Config files
 composer.json
 composer.lock
 gulpfile.js
@@ -21,5 +44,11 @@ LICENCE
 package-lock.json
 package.json
 postcss.config.js
+vite.config.js
+tailwind.config.js
+biome.json
+pint.json
 readme.md
+CLAUDE.md
 webpack.config.js
+.env.example
