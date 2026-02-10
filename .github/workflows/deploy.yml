@@ -50,9 +50,6 @@ jobs:
       - name: Build production assets
         run: npm run build
 
-      - name: Generate translation files
-        run: npm run pot
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
