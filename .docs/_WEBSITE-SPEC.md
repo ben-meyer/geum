@@ -26,7 +26,7 @@
   Each content type includes:
   - Basic config (URL, dashicon, supports, taxonomies)
   - Archive routing (if applicable)
-  - Custom fields (if any)
+  - Custom fields (if any) 
 
   Format:
   ### slug

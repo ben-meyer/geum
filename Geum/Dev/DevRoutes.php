@@ -118,6 +118,12 @@ class DevRoutes
             'index.php?dev_route=utilities',
             'top'
         );
+
+        \add_rewrite_rule(
+            '^_dev/all-components/?$',
+            'index.php?dev_route=all_components',
+            'top'
+        );
     }
 
     public static function addQueryVars(array $vars): array
@@ -172,6 +178,10 @@ class DevRoutes
 
             case 'utilities':
                 static::renderUtilities();
+                break;
+
+            case 'all_components':
+                static::renderAllComponents();
                 break;
         }
 
@@ -237,6 +247,7 @@ class DevRoutes
         $content .= '<li><a href="'.\esc_url(\home_url('/_dev/globals/')).'">Globals</a></li>';
         $content .= '<li><a href="'.\esc_url(\home_url('/_dev/utilities/')).'">Utilities</a></li>';
         $content .= '<li><a href="'.\esc_url(\home_url('/_dev/components/')).'">Components</a></li>';
+        $content .= '<li><a href="'.\esc_url(\home_url('/_dev/all-components/')).'">All Components</a></li>';
         $content .= '</ul>';
         $content .= '</div>';
 
@@ -307,6 +318,46 @@ class DevRoutes
         if ($template_path) {
             include $template_path;
         }
+
+        \site_main_close();
+        \get_footer();
+    }
+
+    protected static function renderAllComponents(): void
+    {
+        \get_header();
+        \site_main_open();
+
+        $components = static::getComponentsWithExamples();
+        $faker = class_exists('\Faker\Factory') ? \Faker\Factory::create() : null;
+
+        echo '<div class="dev-all-components">';
+        echo '<div class="dev-all-components__header">';
+        echo '<a href="'.\esc_url(\home_url('/_dev/')).'" class="dev-component-list__back">&larr; Dev Index</a>';
+        echo '<h1>All Components</h1>';
+        echo '</div>';
+
+        if (empty($components)) {
+            echo '<p>No components with examples found. Add an <code>example.php</code> file to a component directory.</p>';
+        } else {
+            foreach ($components as $component) {
+                $example_path = \get_theme_file_path("components/{$component}/example.php");
+
+                if (file_exists($example_path)) {
+                    echo '<div class="component-example-section" id="component-'.\esc_attr($component).'">';
+                    echo '<h2 class="component-example-section__title">'.\esc_html(\ucwords(\str_replace('-', ' ', $component))).'</h2>';
+
+                    ob_start();
+                    include $example_path;
+                    $example_output = ob_get_clean();
+
+                    echo '<div class="component-example-section__content">'.$example_output.'</div>';
+                    echo '</div>';
+                }
+            }
+        }
+
+        echo '</div>';
 
         \site_main_close();
         \get_footer();

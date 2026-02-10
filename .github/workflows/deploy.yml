@@ -1,0 +1,87 @@
+name: Deploy Geum Theme to cPanel
+
+on:
+  push:
+    branches:
+      - production  # Only deploy from production branch
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # Match .nvmrc
+          cache: 'npm'
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Composer dependencies (production only)
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Generate translation files
+        run: npm run pot
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/vendor/***/Tests/**
+            **/vendor/***/tests/**
+            **/.vscode/**
+            **/.babelrc
+            **/.browserslistrc
+            **/.deployignore
+            **/.editorconfig
+            **/.eslintrc.json
+            **/.gitignore
+            **/.gitkeep
+            **/.gitmodules
+            **/.nvmrc
+            **/.prettierrc
+            **/.stylelintrc
+            **/composer.json
+            **/composer.lock
+            **/gulpfile.js
+            **/LICENCE
+            **/LICENSE
+            **/package-lock.json
+            **/package.json
+            **/postcss.config.js
+            **/readme.md
+            **/README.md
+            **/webpack.config.js
+            **/vite.config.js
+            **/biome.json
+            **/pint.json
+            **/phpcs.xml
+            **/.docs/**
+            **/dev-scripts/**
+            **/assets/**
+            **/.claude/**
