@@ -50,13 +50,33 @@ jobs:
       - name: Build production assets
         run: npm run build
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Clean up dev files before deployment
+        run: |
+          rm -rf node_modules
+          rm -rf .github
+          rm -rf .vscode
+          rm -rf .docs
+          rm -rf dev-scripts
+          rm -rf assets
+          rm -rf .claude
+          rm -f .babelrc .browserslistrc .deployignore .editorconfig
+          rm -f .eslintrc.json .gitignore .gitkeep .gitmodules .nvmrc
+          rm -f .prettierrc .stylelintrc composer.json composer.lock
+          rm -f gulpfile.js LICENCE package-lock.json package.json
+          rm -f postcss.config.js readme.md webpack.config.js
+          rm -f vite.config.js biome.json pint.json phpcs.xml
+          rm -f auth.json
+
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          remote_path: ${{ secrets.FTP_SERVER_DIR }}
+          local_path: './*'
+          sftp_only: true
+          port: 2223
           exclude: |
             **/.git*
             **/.git*/**
