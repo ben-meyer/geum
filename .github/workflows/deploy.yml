@@ -3,7 +3,7 @@ name: Deploy Geum Theme to cPanel
 on:
   push:
     branches:
-      - production
+      - production  # Only deploy from production branch
 
 jobs:
   deploy:
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20'  # Match .nvmrc
           cache: 'npm'
 
       - name: Setup PHP
@@ -50,56 +50,46 @@ jobs:
       - name: Build production assets
         run: npm run build
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Clean up dev files before deployment
+        run: |
+          # Large directories
+          rm -rf .git
+          rm -rf node_modules
+          rm -rf .github
+          rm -rf .vscode
+          rm -rf .docs
+          rm -rf .claude
+          rm -rf dev-scripts
+          rm -rf assets
+          rm -rf Geum/Dev
+          rm -rf Theme/Dev
+
+          # Vendor dev/test files
+          rm -rf vendor/squizlabs
+          find vendor -type d \( -name tests -o -name Tests -o -name test -o -name Test \) -exec rm -rf {} + 2>/dev/null || true
+          find vendor -name '.git' -type d -exec rm -rf {} + 2>/dev/null || true
+
+          # Component dev files
+          find components -name 'example.php' -delete 2>/dev/null || true
+
+          # Config and dot files
+          rm -f .babelrc .browserslistrc .deployignore .editorconfig
+          rm -f .eslintrc.json .gitignore .gitkeep .gitmodules .nvmrc
+          rm -f .prettierrc .stylelintrc .gitattributes .env.example
+          rm -f composer.json composer.lock auth.json
+          rm -f gulpfile.js LICENCE package-lock.json package.json
+          rm -f postcss.config.js readme.md webpack.config.js
+          rm -f vite.config.js tailwind.config.js biome.json pint.json phpcs.xml
+          rm -f CLAUDE.md
+
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github/**
-            **/node_modules/**
-            **/vendor/***/Tests/**
-            **/vendor/***/tests/**
-            **/.vscode/**
-            **/.claude/**
-            **/.docs/**
-            **/dev-scripts/**
-            **/assets/**
-            **/Geum/Dev/**
-            **/Theme/Dev/**
-            **/vendor/squizlabs/**
-            **/components/**/example.php
-            **/.babelrc
-            **/.browserslistrc
-            **/.deployignore
-            **/.editorconfig
-            **/.eslintrc.json
-            **/.gitignore
-            **/.gitkeep
-            **/.gitmodules
-            **/.nvmrc
-            **/.prettierrc
-            **/.stylelintrc
-            **/.env.example
-            **/auth.json
-            **/composer.json
-            **/composer.lock
-            **/gulpfile.js
-            **/LICENCE
-            **/LICENSE
-            **/package-lock.json
-            **/package.json
-            **/postcss.config.js
-            **/vite.config.js
-            **/tailwind.config.js
-            **/biome.json
-            **/pint.json
-            **/phpcs.xml
-            **/readme.md
-            **/README.md
-            **/CLAUDE.md
-            **/webpack.config.js
+          remote_path: ${{ secrets.FTP_SERVER_DIR }}
+          local_path: .
+          sftp_only: true
+          port: 2223
+          delete_remote_files: false
