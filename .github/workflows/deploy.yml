@@ -52,20 +52,35 @@ jobs:
 
       - name: Clean up dev files before deployment
         run: |
+          # Large directories
+          rm -rf .git
           rm -rf node_modules
           rm -rf .github
           rm -rf .vscode
           rm -rf .docs
+          rm -rf .claude
           rm -rf dev-scripts
           rm -rf assets
-          rm -rf .claude
+          rm -rf Geum/Dev
+          rm -rf Theme/Dev
+
+          # Vendor dev/test files
+          rm -rf vendor/squizlabs
+          find vendor -type d \( -name tests -o -name Tests -o -name test -o -name Test \) -exec rm -rf {} + 2>/dev/null || true
+          find vendor -name '.git' -type d -exec rm -rf {} + 2>/dev/null || true
+
+          # Component dev files
+          find components -name 'example.php' -delete 2>/dev/null || true
+
+          # Config and dot files
           rm -f .babelrc .browserslistrc .deployignore .editorconfig
           rm -f .eslintrc.json .gitignore .gitkeep .gitmodules .nvmrc
-          rm -f .prettierrc .stylelintrc composer.json composer.lock
+          rm -f .prettierrc .stylelintrc .gitattributes .env.example
+          rm -f composer.json composer.lock auth.json
           rm -f gulpfile.js LICENCE package-lock.json package.json
           rm -f postcss.config.js readme.md webpack.config.js
-          rm -f vite.config.js biome.json pint.json phpcs.xml
-          rm -f auth.json
+          rm -f vite.config.js tailwind.config.js biome.json pint.json phpcs.xml
+          rm -f CLAUDE.md
 
       - name: Deploy via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4

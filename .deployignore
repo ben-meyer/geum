@@ -9,6 +9,15 @@ vendor/**/test
 vendor/**/Test
 vendor/**/.git
 
+# Version Control
+.git
+.git/**
+.gitignore
+.gitkeep
+**/.gitkeep
+.gitmodules
+.gitattributes
+
 # IDE & Config
 .vscode
 .vscode/**
@@ -17,10 +26,6 @@ vendor/**/.git
 .deployignore
 .editorconfig
 .eslintrc.json
-.gitignore
-.gitkeep
-**/.gitkeep
-.gitmodules
 .nvmrc
 .prettierrc
 .stylelintrc
