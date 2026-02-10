@@ -28,6 +28,17 @@ jobs:
           php-version: '8.2'
           tools: composer:v2
 
+      - name: Configure ACF Pro authentication
+        run: |
+          echo '{
+            "http-basic": {
+              "connect.advancedcustomfields.com": {
+                "username": "${{ secrets.ACF_PRO_KEY }}",
+                "password": "${{ secrets.SITE_URL }}"
+              }
+            }
+          }' > auth.json
+
       - name: Install Node dependencies
         run: npm ci
 
