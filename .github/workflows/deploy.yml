@@ -40,7 +40,7 @@ jobs:
           }' > auth.json
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install Composer dependencies (production only)
         run: composer install --no-dev --optimize-autoloader --no-interaction
